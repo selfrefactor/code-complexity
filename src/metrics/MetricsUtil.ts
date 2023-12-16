@@ -52,7 +52,6 @@ export class MetricsUtil {
         const jsDocSelector = "javascript";
         const jsxDocSelector = "javascriptreact";
         const tsxDocSelector = "typescriptreact";
-        const luaDocSelector = "lua";
         const vueDocSelector = "vue";
         const htmlDocSelector = "html";
 
@@ -62,7 +61,6 @@ export class MetricsUtil {
             jsDocSelector,
             jsxDocSelector,
             tsxDocSelector,
-            luaDocSelector,
             vueDocSelector,
             htmlDocSelector,
         ];

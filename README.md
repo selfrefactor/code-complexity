@@ -2,4 +2,13 @@
 
 Fork of https://github.com/kisstkondoros/codemetrics
 
-Difference is that instead of 4 levels of color decoration, there are 24 levels.
+Differences:
+
+-  instead of 4 levels of color decoration, there are 24 levels.
+- no lua/vue support
+- one level of complexity
+- no second decoration, `CodeLensEnabled` is not used
+
+## TODO
+
+remove `codemetrics` as settings prefix

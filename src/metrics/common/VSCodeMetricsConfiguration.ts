@@ -1,9 +1,7 @@
 import { IMetricsConfiguration, MetricsConfiguration } from "tsmetrics-core/lib/MetricsConfiguration";
-import { getInitialLuaStatementMetricsConfiguration } from "./LuaStatementMetricsConfiguration";
 
 const VSCodeMetricsConfigurationDefaults = {
     Exclude: [],
-    EnabledForLua: true,
     EnabledForJS: true,
     EnabledForJSX: true,
     EnabledForTS: true,
@@ -23,7 +21,6 @@ const VSCodeMetricsConfigurationDefaults = {
     ComplexityColorExtreme: "#ff0000",
 
     FileSizeLimitMB: 0.5,
-    LuaStatementMetricsConfiguration: getInitialLuaStatementMetricsConfiguration(),
 };
 
 export type IVSCodeMetricsConfiguration = typeof VSCodeMetricsConfigurationDefaults & IMetricsConfiguration;

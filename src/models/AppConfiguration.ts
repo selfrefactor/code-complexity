@@ -28,13 +28,6 @@ export class AppConfiguration {
                 continue;
             }
         }
-        for (var propertyName in resultingSettings.LuaStatementMetricsConfiguration) {
-            property = "luaconfiguration." + propertyName;
-            if (settings.has(property)) {
-                resultingSettings.LuaStatementMetricsConfiguration[propertyName] = settings.get(property);
-                continue;
-            }
-        }
         if (this.toggleCodeMetricsForArrowFunctionsExecuted) {
             resultingSettings.MetricsForArrowFunctionsToggled = this.codeMetricsForArrowFunctionsToggled;
         }

@@ -14,12 +14,10 @@ import {
 import { MetricsUtil } from "../metrics/MetricsUtil";
 import { IMetricsModel } from "tsmetrics-core/lib/MetricsModel";
 import { IVSCodeMetricsConfiguration } from "../metrics/common/VSCodeMetricsConfiguration";
+import { getColor } from "./get-color";
 
 export class EditorDecoration implements Disposable {
     private low: TextEditorDecorationType;
-    private normal: TextEditorDecorationType;
-    private high: TextEditorDecorationType;
-    private extreme: TextEditorDecorationType;
     private decorationModeEnabled: boolean = false;
     private decorationTemplate: string;
     private overviewRulerModeEnabled: boolean = false;
@@ -66,11 +64,11 @@ export class EditorDecoration implements Disposable {
         }
         // for some reason the context is lost
         var thisContext = this;
+        const size: number = workspace.getConfiguration("editor", document.uri).get("fontSize");
         this.metricsUtil.getMetrics(document).then(
             (metrics) => {
                 if (thisContext.settingsChanged(settings) || this.low == null) {
                     thisContext.clearDecorators(editor);
-                    thisContext.updateDecorators(settings, document.uri);
                 }
                 const toDecoration = (model: IMetricsModel): DecorationOptions => {
                     return {
@@ -82,34 +80,19 @@ export class EditorDecoration implements Disposable {
                     return { complexity: p.getCollectedComplexity(), model: p };
                 });
 
-                const lowLevelDecorations = complexityAndModel
-                    .filter((p) => p.complexity <= settings.ComplexityLevelNormal)
-                    .map((p) => toDecoration(p.model));
+                const decorations = complexityAndModel
+                    .map((p) => ({decorationStyle: toDecoration(p.model), complexity: p.complexity}));
 
-                const normalLevelDecorations = complexityAndModel
-                    .filter(
-                        (p) =>
-                            p.complexity > settings.ComplexityLevelNormal &&
-                            p.complexity <= settings.ComplexityLevelHigh
-                    )
-                    .map((p) => toDecoration(p.model));
-
-                const highLevelDecorations = complexityAndModel
-                    .filter(
-                        (p) =>
-                            p.complexity > settings.ComplexityLevelHigh &&
-                            p.complexity <= settings.ComplexityLevelExtreme
-                    )
-                    .map((p) => toDecoration(p.model));
-
-                const extremeLevelDecorations = complexityAndModel
-                    .filter((p) => p.complexity > settings.ComplexityLevelExtreme)
-                    .map((p) => toDecoration(p.model));
-
-                editor.setDecorations(thisContext.low, lowLevelDecorations);
-                editor.setDecorations(thisContext.normal, normalLevelDecorations);
-                editor.setDecorations(thisContext.high, highLevelDecorations);
-                editor.setDecorations(thisContext.extreme, extremeLevelDecorations);
+                 decorations.forEach(({decorationStyle, complexity}) => {
+                    const decoration = this.createDecorationType(
+                        settings.DecorationModeEnabled,
+                        settings.OverviewRulerModeEnabled,
+                        settings.DecorationTemplate,
+                        getColor(complexity),
+                        size
+                    );
+                    editor.setDecorations(decoration, [decorationStyle]);
+                 })   
             },
             (e) => {
                 var exmsg = "";
@@ -135,44 +118,9 @@ export class EditorDecoration implements Disposable {
     }
     private clearDecorators(editor: TextEditor) {
         this.low && editor.setDecorations(this.low, []);
-        this.normal && editor.setDecorations(this.normal, []);
-        this.high && editor.setDecorations(this.high, []);
-        this.extreme && editor.setDecorations(this.extreme, []);
         this.disposeDecorators();
     }
 
-    private updateDecorators(settings: IVSCodeMetricsConfiguration, resource: Uri) {
-        const size: number = workspace.getConfiguration("editor", resource).get("fontSize");
-
-        this.low = this.createDecorationType(
-            settings.DecorationModeEnabled,
-            settings.OverviewRulerModeEnabled,
-            settings.DecorationTemplate,
-            settings.ComplexityColorLow,
-            size
-        );
-        this.normal = this.createDecorationType(
-            settings.DecorationModeEnabled,
-            settings.OverviewRulerModeEnabled,
-            settings.DecorationTemplate,
-            settings.ComplexityColorNormal,
-            size
-        );
-        this.high = this.createDecorationType(
-            settings.DecorationModeEnabled,
-            settings.OverviewRulerModeEnabled,
-            settings.DecorationTemplate,
-            settings.ComplexityColorHigh,
-            size
-        );
-        this.extreme = this.createDecorationType(
-            settings.DecorationModeEnabled,
-            settings.OverviewRulerModeEnabled,
-            settings.DecorationTemplate,
-            settings.ComplexityColorExtreme,
-            size
-        );
-    }
     createDecorationType(
         decorationModeEnabled: boolean,
         overviewRulerModeEnabled: boolean,
@@ -204,13 +152,7 @@ export class EditorDecoration implements Disposable {
     }
     disposeDecorators() {
         this.low && this.low.dispose();
-        this.normal && this.normal.dispose();
-        this.high && this.high.dispose();
-        this.extreme && this.extreme.dispose();
         this.low = null;
-        this.normal = null;
-        this.high = null;
-        this.extreme = null;
     }
 
     public dispose(): void {
