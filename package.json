@@ -1,10 +1,10 @@
 {
-  "name": "vscode-code-complexity",
+  "name": "code-complexity",
   "private": true,
   "description": "Computes complexity in TypeScript / JavaScript files.",
   "publisher": "selfrefactor",
   "license": "MIT",
-  "version": "1.26.1",
+  "version": "0.0.1",
   "displayName": "CodeComplexity",
   "icon": "images/logo.png",
   "engines": {
