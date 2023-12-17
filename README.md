@@ -1,6 +1,6 @@
 # Code Complexity - Fork of Code Metrics
 
-Fork of https://github.com/kisstkondoros/codemetrics
+Fork of https://github.com/kisstkondoros/codecomplexity
 
 Differences:
 
@@ -11,4 +11,10 @@ Differences:
 
 ## TODO
 
-remove `codemetrics` as settings prefix
+remove `codecomplexity` as settings prefix
+
+test recalculate
+
+remove 1 in template
+
+remove unused settings
