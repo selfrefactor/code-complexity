@@ -11,6 +11,8 @@ Differences:
 
 ## TODO
 
+remove CodeLensEnabled
+
 remove `codecomplexity` as settings prefix
 
 test recalculate

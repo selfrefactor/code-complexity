@@ -77,12 +77,6 @@
           "description": "A flag which indicates whether code metrics are shown as code lens",
           "type": "boolean"
         },
-        "codemetrics.basics.DiagnosticsEnabled": {
-          "scope": "resource",
-          "default": false,
-          "description": "A flag which indicates whether code metrics are shown as diagnostics",
-          "type": "boolean"
-        },
         "codemetrics.basics.IgnoredFunctionNames": {
           "scope": "resource",
           "default": [],
@@ -172,90 +166,6 @@
           "default": true,
           "description": "A flag which indicates whether codemetrics are enabled for TSX",
           "type": "boolean"
-        },
-        "codemetrics.basics.ComplexityColorLow": {
-          "scope": "resource",
-          "default": "#4bb14f",
-          "description": "Color for the low complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorNormal": {
-          "scope": "resource",
-          "default": "#ffc208",
-          "description": "Color for the normal complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorHigh": {
-          "scope": "resource",
-          "default": "#f44034",
-          "description": "Color for the high complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorExtreme": {
-          "scope": "resource",
-          "default": "#ff0000",
-          "description": "Color for the extreme complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityLevelExtreme": {
-          "scope": "resource",
-          "default": 25,
-          "description": "Threshold to determine extreme high complexity level",
-          "type": "number"
-        },
-        "codemetrics.basics.ComplexityLevelHigh": {
-          "scope": "resource",
-          "default": 10,
-          "description": "Threshold to determine high complexity level",
-          "type": "number"
-        },
-        "codemetrics.basics.ComplexityLevelNormal": {
-          "scope": "resource",
-          "default": 5,
-          "description": "Threshold to determine normal complexity level",
-          "type": "number"
-        },
-        "codemetrics.basics.ComplexityLevelLow": {
-          "scope": "resource",
-          "default": 0,
-          "description": "Threshold to determine low complexity level",
-          "type": "number"
-        },
-        "codemetrics.basics.CodeLensHiddenUnder": {
-          "scope": "resource",
-          "default": 3,
-          "description": "Threshold to show code lens for code metrics",
-          "type": "number"
-        },
-        "codemetrics.basics.ComplexityLevelExtremeDescription": {
-          "scope": "resource",
-          "default": "Bloody hell...",
-          "description": "Code lens message for extreme high complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityLevelHighDescription": {
-          "scope": "resource",
-          "default": "You must be kidding",
-          "description": "Code lens message for high complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityLevelNormalDescription": {
-          "scope": "resource",
-          "default": "It's time to do something...",
-          "description": "Code lens message for normal complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityLevelLowDescription": {
-          "scope": "resource",
-          "default": "Everything is cool!",
-          "description": "Code lens message for low complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityTemplate": {
-          "scope": "resource",
-          "default": "Complexity is {0} {1}",
-          "description": "Code lens message template {0} stands for the actual value {1} is for the complexity level description",
-          "type": "string"
         },
         "codemetrics.nodeconfiguration.AnyKeyword": {
           "scope": "resource",
@@ -976,6 +886,12 @@
           "scope": "resource",
           "default": "With statement",
           "type": "string"
+        },
+        "codemetrics.basics.CodeLensHiddenUnder": {
+          "scope": "resource",
+          "default": 3,
+          "description": "Threshold to show code lens for code metrics",
+          "type": "number"
         }
       }
     }

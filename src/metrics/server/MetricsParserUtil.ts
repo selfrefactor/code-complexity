@@ -41,18 +41,6 @@ export class MetricsParserUtil {
                 });
             };
             collect(metrics.metrics);
-
-            if (this.appConfig.DiagnosticsEnabled) {
-                diagnostics = result.map((model) => {
-                    return {
-                        range: Range.create(document.positionAt(model.start), document.positionAt(model.end)),
-                        message: model.toString(this.appConfig),
-                        source: "codemetrics",
-                        severity: DiagnosticSeverity.Hint,
-                        code: "42",
-                    };
-                });
-            }
         }
 
         this.connection.sendDiagnostics({ uri: document.uri, diagnostics: diagnostics });
@@ -64,7 +52,6 @@ export class MetricsParserUtil {
         if (languageId == "typescriptreact" && !this.appConfig.EnabledForTSX) return true;
         if (languageId == "javascript" && !this.appConfig.EnabledForJS) return true;
         if (languageId == "javascriptreact" && !this.appConfig.EnabledForJSX) return true;
-        if (languageId == "vue" && !this.appConfig.EnabledForVue) return true;
         if (languageId == "html" && !this.appConfig.EnabledForHTML) return true;
         return false;
     }
@@ -89,15 +76,11 @@ export class MetricsParserUtil {
         });
     }
 
-    private isVue(languageId: string) {
-        return languageId == "vue";
-    }
-
     private isHTML(languageId: string) {
         return languageId == "html";
     }
 
     private isHTMLLike(languageId: string) {
-        return this.isVue(languageId) || this.isHTML(languageId);
+        return this.isHTML(languageId);
     }
 }
