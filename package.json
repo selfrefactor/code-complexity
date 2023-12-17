@@ -28,21 +28,9 @@
 		"onLanguage:javascript",
 		"onLanguage:javascriptreact",
 		"onLanguage:typescript",
-		"onLanguage:typescriptreact",
-		"onCommand:codemetrics.toggleCodeMetricsForArrowFunctions",
-		"onCommand:codemetrics.toggleCodeMetricsDisplayed"
+		"onLanguage:typescriptreact"
 	],
 	"contributes": {
-		"commands": [
-			{
-				"command": "codemetrics.toggleCodeMetricsForArrowFunctions",
-				"title": "Toggle code lenses for arrow functions"
-			},
-			{
-				"command": "codemetrics.toggleCodeMetricsDisplayed",
-				"title": "Toggle code metrics"
-			}
-		],
 		"configuration": {
 			"type": "object",
 			"title": "CodeMetrics configuration",
@@ -70,12 +58,6 @@
 					"default": "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}' height='{{size}}' style='fill:{{color}};stroke-width:1;stroke:#fff'/></svg>",
 					"description": "A flag which indicates whether code metrics are shown as inline decoration",
 					"type": "string"
-				},
-				"codemetrics.basics.CodeLensEnabled": {
-					"scope": "resource",
-					"default": true,
-					"description": "A flag which indicates whether code metrics are shown as code lens",
-					"type": "boolean"
 				},
 				"codemetrics.basics.IgnoredFunctionNames": {
 					"scope": "resource",
@@ -889,7 +871,7 @@
 				},
 				"codemetrics.basics.CodeLensHiddenUnder": {
 					"scope": "resource",
-					"default": 3,
+					"default": 0,
 					"description": "Threshold to show code lens for code metrics",
 					"type": "number"
 				}

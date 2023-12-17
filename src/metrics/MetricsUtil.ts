@@ -52,7 +52,6 @@ export class MetricsUtil {
         const jsDocSelector = "javascript";
         const jsxDocSelector = "javascriptreact";
         const tsxDocSelector = "typescriptreact";
-        const vueDocSelector = "vue";
         const htmlDocSelector = "html";
 
         const supportedSchemes = ["file", "untitled"];
@@ -61,7 +60,6 @@ export class MetricsUtil {
             jsDocSelector,
             jsxDocSelector,
             tsxDocSelector,
-            vueDocSelector,
             htmlDocSelector,
         ];
 

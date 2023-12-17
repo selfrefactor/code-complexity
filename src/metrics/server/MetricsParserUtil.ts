@@ -33,7 +33,8 @@ export class MetricsParserUtil {
                 metrics = MetricsParser.getMetricsFromText(document.uri, input, this.appConfig, <any>target);
             }
             var collect = (model: IMetricsModel) => {
-                if (model.visible && model.getCollectedComplexity() >= this.appConfig.CodeLensHiddenUnder) {
+                // if (model.visible && model.getCollectedComplexity() >= this.appConfig.CodeLensHiddenUnder) {
+                if (model.visible) {
                     result.push(model);
                 }
                 model.children.forEach((element) => {
