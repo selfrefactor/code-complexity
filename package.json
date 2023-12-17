@@ -8,7 +8,7 @@
 	"displayName": "CodeComplexity",
 	"icon": "images/logo.png",
 	"engines": {
-		"vscode": "^1.73.0"
+		"vscode": "^1.85.0"
 	},
 	"repository": {
 		"type": "git",
