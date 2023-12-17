@@ -4,7 +4,7 @@
   "description": "Computes complexity in TypeScript / JavaScript files.",
   "publisher": "selfrefactor",
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "displayName": "CodeComplexity",
   "icon": "images/logo.png",
   "engines": {
