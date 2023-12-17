@@ -17,7 +17,7 @@ import { IVSCodeMetricsConfiguration } from "../metrics/common/VSCodeMetricsConf
 import { getColor } from "./get-color";
 
 export class EditorDecoration implements Disposable {
-    private low: TextEditorDecorationType;
+    private decoratorInstances: TextEditorDecorationType[] = [];
     private decorationModeEnabled: boolean = false;
     private decorationTemplate: string;
     private overviewRulerModeEnabled: boolean = false;
@@ -67,7 +67,7 @@ export class EditorDecoration implements Disposable {
         const size: number = workspace.getConfiguration("editor", document.uri).get("fontSize");
         this.metricsUtil.getMetrics(document).then(
             (metrics) => {
-                if (thisContext.settingsChanged(settings) || this.low == null) {
+                if (thisContext.settingsChanged(settings) || this.decoratorInstances.length === 0) {
                     thisContext.clearDecorators(editor);
                 }
                 const toDecoration = (model: IMetricsModel): DecorationOptions => {
@@ -83,7 +83,7 @@ export class EditorDecoration implements Disposable {
                 const decorations = complexityAndModel
                     .map((p) => ({decorationStyle: toDecoration(p.model), complexity: p.complexity}));
 
-                 decorations.forEach(({decorationStyle, complexity}) => {
+                 const decoratorInstances = decorations.map(({decorationStyle, complexity}) => {
                     const decoration = this.createDecorationType(
                         settings.DecorationModeEnabled,
                         settings.OverviewRulerModeEnabled,
@@ -92,7 +92,10 @@ export class EditorDecoration implements Disposable {
                         size
                     );
                     editor.setDecorations(decoration, [decorationStyle]);
-                 })   
+
+                    return decoration;
+                 })  
+                 thisContext.decoratorInstances = decoratorInstances;
             },
             (e) => {
                 var exmsg = "";
@@ -117,7 +120,12 @@ export class EditorDecoration implements Disposable {
         return changed;
     }
     private clearDecorators(editor: TextEditor) {
-        this.low && editor.setDecorations(this.low, []);
+        if (this.decoratorInstances.length > 0) {
+            this.decoratorInstances.forEach((decorator) => {
+                editor.setDecorations(decorator, []);
+            });
+            this.decoratorInstances = [];
+        }
         this.disposeDecorators();
     }
 
@@ -151,8 +159,12 @@ export class EditorDecoration implements Disposable {
         return Uri.parse(`data:image/svg+xml,` + encodeURIComponent(decoration));
     }
     disposeDecorators() {
-        this.low && this.low.dispose();
-        this.low = null;
+        if (this.decoratorInstances.length > 0) {
+            this.decoratorInstances.forEach((decorator) => {
+                decorator.dispose();
+            });
+        }
+        this.decoratorInstances = [];
     }
 
     public dispose(): void {
