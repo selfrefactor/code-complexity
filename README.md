@@ -4,19 +4,8 @@ Fork of https://github.com/kisstkondoros/codecomplexity
 
 Differences:
 
--  instead of 4 levels of color decoration, there are 24 levels.
-- no lua/vue support
-- one level of complexity
+- instead of 4 levels of color decoration, there are 30 levels.
+- no lua/vue/html support
 - no second decoration, `CodeLensEnabled` is not used
 
-## TODO
-
-remove CodeLensEnabled
-
-remove `codecomplexity` as settings prefix
-
-test recalculate
-
-remove 1 in template
-
-remove unused settings
+![image](images/show.png)
