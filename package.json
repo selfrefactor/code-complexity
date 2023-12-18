@@ -17,8 +17,8 @@
 	"devDependencies": {
 		"@types/minimatch": "5.1.2",
 		"@types/node": "20.10.5",
-		"@types/vscode": "1.70.0",
-		"esbuild": "0.19.9"
+		"@types/vscode": "1.73.0",
+		"esbuild": "0.16.9"
 	},
 	"dependencies": {
 		"minimatch": "9.0.3",
