@@ -84,7 +84,7 @@ export class EditorDecoration implements Disposable {
         }
         const toDecoration = (model: IMetricsModel): DecorationOptions => {
           return {
-            hoverMessage: model.toString(settings),
+            hoverMessage: model.toString(),
             range: thisContext.metricsUtil.toDecorationRange(
               model.start,
               document

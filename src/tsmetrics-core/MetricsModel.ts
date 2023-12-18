@@ -1,5 +1,3 @@
-import { IMetricsConfiguration } from "./MetricsConfiguration";
-
 export type CollectorType = "SUM" | "MAX";
 
 export interface IMetricsModel {
@@ -15,7 +13,7 @@ export interface IMetricsModel {
   collectorType: CollectorType;
   getCollectedComplexity(): number;
   toLogString(level: string): string;
-  toString(settings: IMetricsConfiguration): string;
+  toString(): string;
   getExplanation(): string;
   clone(deepClone?: boolean): IMetricsModel;
 }
@@ -103,26 +101,9 @@ export class MetricsModel implements IMetricsModel {
     return pad.substring(0, Math.max(0, pad.length - str.length)) + str;
   }
 
-  public toString(settings: IMetricsConfiguration): string {
+  public toString(): string {
     let complexitySum: number = this.getCollectedComplexity();
-    let instruction: string = "";
-    if (complexitySum > settings.ComplexityLevelExtreme) {
-      instruction = settings.ComplexityLevelExtremeDescription;
-    } else if (complexitySum > settings.ComplexityLevelHigh) {
-      instruction = settings.ComplexityLevelHighDescription;
-    } else if (complexitySum > settings.ComplexityLevelNormal) {
-      instruction = settings.ComplexityLevelNormalDescription;
-    } else if (complexitySum > settings.ComplexityLevelLow) {
-      instruction = settings.ComplexityLevelLowDescription;
-    }
-    let template = settings.ComplexityTemplate + "";
-    if (!settings.ComplexityTemplate || template.trim().length == 0) {
-      template = "Complexity is {0} {1}";
-    }
-
-    return template
-      .replace("{0}", this.roundComplexity(complexitySum) + "")
-      .replace("{1}", instruction);
+    return String(this.roundComplexity(complexitySum))
   }
 
   public getExplanation(): string {

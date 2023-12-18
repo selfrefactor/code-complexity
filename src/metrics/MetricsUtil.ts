@@ -106,7 +106,7 @@ export class MetricsUtil {
     }
 
     public format(model: CodeMetricsCodeLens): string {
-        return model.toString(this.appConfig);
+        return model.toString();
     }
 
     public toRange(model: IMetricsModel, document: TextDocument): Range {
