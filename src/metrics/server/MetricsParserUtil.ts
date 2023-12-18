@@ -1,10 +1,11 @@
 import { ScriptTarget } from "typescript";
 import { Minimatch } from "minimatch";
-import { Connection, Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
+import { Connection, Diagnostic, } from "vscode-languageserver";
 import { IVSCodeMetricsConfiguration } from "../common/VSCodeMetricsConfiguration";
 
-import { IMetricsModel, MetricsParser, IMetricsParseResult } from "tsmetrics-core";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import { IMetricsModel } from "../../tsmetrics-core/MetricsModel";
+import { IMetricsParseResult, MetricsParser } from "../../tsmetrics-core/MetricsParser";
 
 export class MetricsParserUtil {
     constructor(private appConfig: IVSCodeMetricsConfiguration, private connection: Connection) {}

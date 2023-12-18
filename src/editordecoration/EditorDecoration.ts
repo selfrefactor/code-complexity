@@ -12,9 +12,9 @@ import {
   DecorationRangeBehavior,
 } from 'vscode'
 import {MetricsUtil} from '../metrics/MetricsUtil'
-import {IMetricsModel} from 'tsmetrics-core/lib/MetricsModel'
 import {IVSCodeMetricsConfiguration} from '../metrics/common/VSCodeMetricsConfiguration'
 import {getColor} from './get-color'
+import { IMetricsModel } from '../tsmetrics-core/MetricsModel'
 
 export class EditorDecoration implements Disposable {
   private decoratorInstances: TextEditorDecorationType[] = []

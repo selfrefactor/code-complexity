@@ -1,4 +1,4 @@
-import { IMetricsConfiguration, MetricsConfiguration } from "tsmetrics-core/lib/MetricsConfiguration";
+import { IMetricsConfiguration, MetricsConfiguration } from "../../tsmetrics-core/MetricsConfiguration";
 
 const VSCodeMetricsConfigurationDefaults = {
     Exclude: [],

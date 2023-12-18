@@ -1,6 +1,6 @@
 import { CodeLens, Range, Uri } from "vscode";
-import { IMetricsModel } from "tsmetrics-core/lib/MetricsModel";
 import { AppConfiguration } from "../models/AppConfiguration";
+import { IMetricsModel } from "../tsmetrics-core/MetricsModel";
 
 export class CodeMetricsCodeLens extends CodeLens {
     constructor(public model: IMetricsModel, private uri: Uri, range: Range) {
