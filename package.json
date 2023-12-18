@@ -17,7 +17,7 @@
 	"devDependencies": {
 		"@types/minimatch": "5.1.2",
 		"@types/node": "20.10.5",
-		"@types/vscode": "1.85.0",
+		"@types/vscode": "1.70.0",
 		"esbuild": "0.19.9"
 	},
 	"dependencies": {
@@ -28,7 +28,7 @@
 		"vscode-languageserver-textdocument": "1.0.11"
 	},
 	"engines": {
-		"vscode": "^1.85.0"
+		"vscode": "^1.73.0"
 	},
 	"repository": {
 		"type": "git",
