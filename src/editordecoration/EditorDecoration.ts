@@ -14,12 +14,14 @@ import {
 import {MetricsUtil} from '../metrics/MetricsUtil'
 import {IVSCodeMetricsConfiguration} from '../metrics/common/VSCodeMetricsConfiguration'
 import {getColor} from './get-color'
+import {interpolate} from 'rambdax'
 import { IMetricsModel } from '../tsmetrics-core/MetricsModel'
+
+let decorationTemplate = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:#ddd'/><text dy='1px' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' style='fill:#fff;font-size:{{size}}px;'>{{complexity}}</text></svg>"
 
 export class EditorDecoration implements Disposable {
   private decoratorInstances: TextEditorDecorationType[] = []
   private decorationModeEnabled: boolean = false
-  private decorationTemplate: string
   private overviewRulerModeEnabled: boolean = false
 
   private metricsUtil: MetricsUtil
@@ -84,7 +86,6 @@ export class EditorDecoration implements Disposable {
         }
         const toDecoration = (model: IMetricsModel): DecorationOptions => {
           return {
-            hoverMessage: model.toString(),
             range: thisContext.metricsUtil.toDecorationRange(
               model.start,
               document
@@ -110,9 +111,9 @@ export class EditorDecoration implements Disposable {
             const decoration = this.createDecorationType(
               settings.DecorationModeEnabled,
               settings.OverviewRulerModeEnabled,
-              settings.DecorationTemplate,
               getColor(complexity),
-              size
+              size,
+              complexity
             )
             editor.setDecorations(decoration, [decorationStyle])
 
@@ -136,10 +137,8 @@ export class EditorDecoration implements Disposable {
   private settingsChanged(settings: IVSCodeMetricsConfiguration): boolean {
     const changed =
       settings.DecorationModeEnabled != this.decorationModeEnabled ||
-      settings.DecorationTemplate != this.decorationTemplate ||
       settings.OverviewRulerModeEnabled != this.overviewRulerModeEnabled
     this.decorationModeEnabled = settings.DecorationModeEnabled
-    this.decorationTemplate = settings.DecorationTemplate
     this.overviewRulerModeEnabled = settings.OverviewRulerModeEnabled
     return changed
   }
@@ -156,18 +155,18 @@ export class EditorDecoration implements Disposable {
   createDecorationType(
     decorationModeEnabled: boolean,
     overviewRulerModeEnabled: boolean,
-    decorationTemplate: string,
     color: string,
-    size: number
+    size: number,
+    complexity: number
   ) {
     const options: DecorationRenderOptions = {
       overviewRulerLane: OverviewRulerLane.Right,
       overviewRulerColor: color,
       before: {
         contentIconPath: this.getContentIconPath(
-          decorationTemplate,
           color,
-          size
+          size,
+          complexity
         ),
         margin: `${size / 2}px`,
       },
@@ -182,15 +181,12 @@ export class EditorDecoration implements Disposable {
     return window.createTextEditorDecorationType(options)
   }
   getContentIconPath(
-    decorationTemplate: string,
     color: string,
-    size: number
+    size: number,
+    complexity: number
   ): Uri {
-    const templateVariables = {color, size}
-    const decoration = decorationTemplate.replace(
-      /\{\{(.+?)\}\}/g,
-      (match, varName) => templateVariables[varName]
-    )
+    const decoration = interpolate(decorationTemplate, {color, size, complexity})
+    
     return Uri.parse(`data:image/svg+xml,` + encodeURIComponent(decoration))
   }
   disposeDecorators() {

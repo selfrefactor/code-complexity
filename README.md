@@ -6,6 +6,7 @@ Fork of https://github.com/kisstkondoros/codecomplexity
 
 Differences:
 
+- show complexity number inside the decoration; no need to hover to see the number
 - instead of 4 levels of color decoration, there are 30 levels.
 - no lua/vue/html support
 - no second decoration, `CodeLensEnabled` is not used
