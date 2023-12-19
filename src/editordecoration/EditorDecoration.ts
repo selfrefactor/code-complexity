@@ -14,10 +14,11 @@ import {
 import {MetricsUtil} from '../metrics/MetricsUtil'
 import {IVSCodeMetricsConfiguration} from '../metrics/common/VSCodeMetricsConfiguration'
 import {getColor} from './get-color'
-import {interpolate} from 'rambdax'
+import {interpolate, toDecimal} from 'rambdax'
 import { IMetricsModel } from '../tsmetrics-core/MetricsModel'
 
-let decorationTemplate = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:#ddd'/><text dy='1px' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' style='fill:#fff;font-size:{{size}}px;'>{{complexity}}</text></svg>"
+let decorationTemplateSimple = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/></svg>"
+let decorationTemplateComplex = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/><text dy='1px' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' style='fill:#fff;font-size:{{textSize}}px;'>{{complexity}}</text></svg>"
 
 export class EditorDecoration implements Disposable {
   private decoratorInstances: TextEditorDecorationType[] = []
@@ -86,6 +87,7 @@ export class EditorDecoration implements Disposable {
         }
         const toDecoration = (model: IMetricsModel): DecorationOptions => {
           return {
+            hoverMessage: model.toString(),
             range: thisContext.metricsUtil.toDecorationRange(
               model.start,
               document
@@ -185,7 +187,9 @@ export class EditorDecoration implements Disposable {
     size: number,
     complexity: number
   ): Uri {
-    const decoration = interpolate(decorationTemplate, {color, size, complexity})
+    const template = complexity > 12 ? decorationTemplateComplex : decorationTemplateSimple
+    const textSize = toDecimal(size * 0.85)
+    const decoration = interpolate(template, {color, size, complexity, textSize})
     
     return Uri.parse(`data:image/svg+xml,` + encodeURIComponent(decoration))
   }

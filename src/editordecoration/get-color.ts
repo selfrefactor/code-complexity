@@ -1,4 +1,5 @@
 import {window, ColorThemeKind} from 'vscode'
+import { MIN_COMPLEXITY } from '../constants'
 
 function isDarkTheme() {
   const currentTheme = window.activeColorTheme.kind
@@ -7,55 +8,50 @@ function isDarkTheme() {
 
 const LEVEL1 = [
   "#00ff00",
-  "#05fa0d",
-  "#0af51a",
-  "#0ff127",
-  "#14ec34",
-  "#19e741",
-  "#1fe34e",
-  "#24de5b",
-  "#29d968",
-  "#2ed575",
-  "#33d082",
-  "#39cc8f"
+  "#13ff13",
+  "#26ff26",
+  "#3afe3a",
+  "#4dff4d",
+  "#61ff61",
+  "#74ff74",
+  "#87ff87"
   ]
 
 const LEVEL2 = [
-  "#52e7e1",
-  "#4ad2e3",
-  "#43bde6",
-  "#3ba8e9",
-  "#3493eb",
-  "#2c7dee",
-  "#2568f1",
-  "#1d53f4",
-  "#163ef6",
-  "#0e29f9",
-  "#0714fc",
-  "#0000ff"
+  "#0000ff",
+  "#0d0dff",
+  "#1b1bff",
+  "#2828ff",
+  "#3636ff",
+  "#4444ff",
+  "#5151ff",
+  "#5f5fff",
+  "#6c6cff",
+  "#7a7aff",
+  "#8787ff"
 ]
 
 const LEVEL3 =[
-  "#cd1d8d",
-  "#d11a80",
-  "#d61773",
-  "#da1566",
-  "#df1259",
-  "#e30f4c",
-  "#e80d40",
-  "#ec0a33",
-  "#f10726",
-  "#f50519",
-  "#fa020c",
-  "#ff0000"
+  "#ff0000",
+  "#ff0d0d",
+  "#ff1b1b",
+  "#ff2828",
+  "#ff3636",
+  "#ff4444",
+  "#ff5151",
+  "#ff5f5f",
+  "#ff6c6c",
+  "#ff7a7a",
+  "#ff8787"
 ]
 
-const colorsLight = [...LEVEL1, ...LEVEL2, ...LEVEL3]
+// const colorsLight = [...LEVEL1, ...LEVEL2, ...LEVEL3]
 
-const colorsDark = [...LEVEL1.slice().reverse(), ...LEVEL2.slice().reverse(), ...LEVEL3.slice().reverse()]
+const colors = [...LEVEL1.slice().reverse(), ...LEVEL2.slice().reverse(), ...LEVEL3.slice().reverse()]
 
-const colors = isDarkTheme() ? colorsDark : colorsLight
+// const colors = isDarkTheme() ? colorsDark : colorsLight
 
 export function getColor(complexity: number): string {
-  return colors[complexity] ?? '#f816f2'
+  const actualIndex = complexity - MIN_COMPLEXITY
+  return colors[actualIndex] ?? '#f816f2'
 }

@@ -6,6 +6,8 @@ import { IVSCodeMetricsConfiguration } from "../common/VSCodeMetricsConfiguratio
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { IMetricsModel } from "../../tsmetrics-core/MetricsModel";
 import { IMetricsParseResult, MetricsParser } from "../../tsmetrics-core/MetricsParser";
+import { MIN_COMPLEXITY } from "../../constants";
+
 
 export class MetricsParserUtil {
     constructor(private appConfig: IVSCodeMetricsConfiguration, private connection: Connection) {}
@@ -21,6 +23,7 @@ export class MetricsParserUtil {
             !this.isLanguageDisabled(document.languageId)
         ) {
             var metrics: IMetricsParseResult | undefined = undefined;
+            // todo remove isHTMLLike
             if (this.isHTMLLike(document.languageId)) {
                 input = input.replace(/<script setup lang="(js|ts)">/gim, "<script --------------*/");
                 input = input.replace(/<script lang="(js|ts)" setup>/gim, "<script --------------*/");
@@ -34,7 +37,7 @@ export class MetricsParserUtil {
                 metrics = MetricsParser.getMetricsFromText(document.uri, input, this.appConfig, <any>target);
             }
             var collect = (model: IMetricsModel) => {
-                if (model.visible) {
+                if (model.visible && model.getCollectedComplexity() >= MIN_COMPLEXITY) {
                     result.push(model);
                 }
                 model.children.forEach((element) => {
