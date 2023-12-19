@@ -45,11 +45,10 @@ const LEVEL3 =[
   "#ff8787"
 ]
 
-// const colorsLight = [...LEVEL1, ...LEVEL2, ...LEVEL3]
+const colorsLight = [...LEVEL1, ...LEVEL2, ...LEVEL3]
+const colorsDark = [...LEVEL1.slice().reverse(), ...LEVEL2.slice().reverse(), ...LEVEL3.slice().reverse()]
 
-const colors = [...LEVEL1.slice().reverse(), ...LEVEL2.slice().reverse(), ...LEVEL3.slice().reverse()]
-
-// const colors = isDarkTheme() ? colorsDark : colorsLight
+const colors = isDarkTheme() ? colorsDark : colorsLight
 
 export function getColor(complexity: number): string {
   const actualIndex = complexity - MIN_COMPLEXITY
