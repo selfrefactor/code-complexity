@@ -31,7 +31,7 @@ export class EditorDecoration implements Disposable {
   constructor(context: ExtensionContext, metricsUtil: MetricsUtil) {
     this.metricsUtil = metricsUtil
 
-    const debouncedUpdate = this.debounce(() => this.update(), 800)
+    const debouncedUpdate = this.debounce(() => this.update(), 500)
     this.didChangeTextDocument = workspace.onDidChangeTextDocument(e => {
       debouncedUpdate()
     })

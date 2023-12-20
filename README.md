@@ -18,9 +18,12 @@ Differences:
 ### Code Complexity
 
 Instead of showing only 4 colors, it shows 25 colors. 
+
 The color of the decoration is based on the complexity of the function.
-Complexity below `5` is not decorated.
-Complexity between `5` and `12` is shown in green.
-Complexity between `12` and `22` is shown in blue. Complexity above `12` is shown inside decoration square.
+
+Complexity value is shown inside decoration square.
+
+Complexity between `0` and `12` is shown in green.
+Complexity between `12` and `22` is shown in blue. 
 Complexity between `22` and `32` is shown in red. 
 Complexity above `32` is shown in purple.
