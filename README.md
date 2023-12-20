@@ -24,6 +24,9 @@ The color of the decoration is based on the complexity of the function.
 Complexity value is shown inside decoration square.
 
 Complexity between `0` and `12` is shown in green.
+
 Complexity between `12` and `22` is shown in blue. 
+
 Complexity between `22` and `32` is shown in red. 
+
 Complexity above `32` is shown in purple.
