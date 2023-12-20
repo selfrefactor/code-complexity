@@ -57,42 +57,6 @@
       "type": "object",
       "title": "CodeMetrics configuration",
       "properties": {
-        "codemetrics.basics.ComplexityColorLowLight": {
-          "scope": "resource",
-          "default": "#4bb14f",
-          "description": "Color for the low complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorNormalLight": {
-          "scope": "resource",
-          "default": "#ffc208",
-          "description": "Color for the normal complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorHighLight": {
-          "scope": "resource",
-          "default": "#f44034",
-          "description": "Color for the high complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorExtremeLight": {
-          "scope": "resource",
-          "default": "#f1f",
-          "description": "Color for the extreme complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorLow": {
-          "scope": "resource",
-          "default": "#4bb14f",
-          "description": "Color for the low complexity level",
-          "type": "string"
-        },
-        "codemetrics.basics.ComplexityColorNormal": {
-          "scope": "resource",
-          "default": "#ffc208",
-          "description": "Color for the normal complexity level",
-          "type": "string"
-        },
         "codemetrics.basics.ComplexityColorHigh": {
           "scope": "resource",
           "default": "#f44034",
