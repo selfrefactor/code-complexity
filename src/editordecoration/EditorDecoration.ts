@@ -19,35 +19,26 @@ import { IMetricsModel } from '../tsmetrics-core/MetricsModel'
 
 let decorationTemplateSimple = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/></svg>"
 let decorationTemplateComplex = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/><text dy='1px' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' style='fill:#fff;font-size:{{textSize}}px;'>{{complexity}}</text></svg>"
-
+  
 export class EditorDecoration implements Disposable {
   private decoratorInstances: TextEditorDecorationType[] = []
   private decorationModeEnabled: boolean = false
   private overviewRulerModeEnabled: boolean = false
 
   private metricsUtil: MetricsUtil
-  private didChangeTextDocument: Disposable
+  private onDidSaveTextDocument: Disposable
   private didOpenTextDocument: Disposable
   constructor(context: ExtensionContext, metricsUtil: MetricsUtil) {
     this.metricsUtil = metricsUtil
-
-    const debouncedUpdate = this.debounce(() => this.update(), 500)
-    this.didChangeTextDocument = workspace.onDidChangeTextDocument(e => {
-      debouncedUpdate()
+    
+    this.onDidSaveTextDocument = workspace.onDidSaveTextDocument(e => {
+      this.update()
     })
     this.didOpenTextDocument = window.onDidChangeActiveTextEditor(e => {
       this.disposeDecorators()
       this.update()
     })
     this.update()
-  }
-
-  private debounce(func: () => void, timeout): () => void {
-    let id
-    return () => {
-      clearTimeout(id)
-      id = setTimeout(() => func(), timeout)
-    }
   }
 
   private update() {
@@ -204,7 +195,7 @@ export class EditorDecoration implements Disposable {
 
   public dispose(): void {
     this.disposeDecorators()
-    this.didChangeTextDocument.dispose()
+    this.onDidSaveTextDocument.dispose()
     this.didOpenTextDocument.dispose()
   }
 }
