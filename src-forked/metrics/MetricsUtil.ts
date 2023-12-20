@@ -2,11 +2,10 @@ import * as path from "path";
 import { Range, TextDocument, ExtensionContext, window, DocumentFilter } from "vscode";
 import { LanguageClientOptions, ServerOptions, TransportKind, LanguageClient } from "vscode-languageclient/node";
 
-import { MetricsModel, IMetricsModel } from "tsmetrics-core/lib/MetricsModel";
-
 import { MetricsRequestType, RequestData } from "./common/protocol";
 import { CodeMetricsCodeLens } from "../models/CodeMetricsCodeLens";
 import { AppConfiguration } from "../models/AppConfiguration";
+import { IMetricsModel, MetricsModel } from "../tsmetrics-core/MetricsModel";
 
 export class MetricsUtil {
     public appConfig: AppConfiguration;
@@ -52,6 +51,7 @@ export class MetricsUtil {
         const jsDocSelector = "javascript";
         const jsxDocSelector = "javascriptreact";
         const tsxDocSelector = "typescriptreact";
+        const htmlDocSelector = "html";
 
         const supportedSchemes = ["file", "untitled"];
         const supportedLanguages = [
@@ -59,6 +59,7 @@ export class MetricsUtil {
             jsDocSelector,
             jsxDocSelector,
             tsxDocSelector,
+            htmlDocSelector,
         ];
 
         const resultingSelector = supportedLanguages

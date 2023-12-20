@@ -1,206 +1,226 @@
 import {
-  TextEditorDecorationType,
-  Disposable,
-  ExtensionContext,
-  workspace,
-  window,
-  DecorationOptions,
-  TextEditor,
-  Uri,
-  DecorationRenderOptions,
-  OverviewRulerLane,
-  DecorationRangeBehavior,
-} from 'vscode'
-import {MetricsUtil} from '../metrics/MetricsUtil'
-import {IVSCodeMetricsConfiguration} from '../metrics/common/VSCodeMetricsConfiguration'
-import {getColor} from './get-color'
-import {interpolate, toDecimal} from 'rambdax'
-import { IMetricsModel } from '../tsmetrics-core/MetricsModel'
+    TextEditorDecorationType,
+    Disposable,
+    ExtensionContext,
+    workspace,
+    window,
+    DecorationOptions,
+    TextEditor,
+    Uri,
+    DecorationRenderOptions,
+    OverviewRulerLane,
+    DecorationRangeBehavior,
+} from "vscode";
+import { MetricsUtil } from "../metrics/MetricsUtil";
+import { IVSCodeMetricsConfiguration } from "../metrics/common/VSCodeMetricsConfiguration";
+import { IMetricsModel } from "../tsmetrics-core/MetricsModel";
 
-let decorationTemplateSimple = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/></svg>"
-let decorationTemplateComplex = "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/><text dy='1px' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' style='fill:#fff;font-size:{{textSize}}px;'>{{complexity}}</text></svg>"
-  
 export class EditorDecoration implements Disposable {
-  private decoratorInstances: TextEditorDecorationType[] = []
-  private decorationModeEnabled: boolean = false
-  private overviewRulerModeEnabled: boolean = false
+    private low: TextEditorDecorationType;
+    private normal: TextEditorDecorationType;
+    private high: TextEditorDecorationType;
+    private extreme: TextEditorDecorationType;
+    private decorationModeEnabled: boolean = false;
+    private decorationTemplate: string;
+    private overviewRulerModeEnabled: boolean = false;
 
-  private metricsUtil: MetricsUtil
-  private onDidSaveTextDocument: Disposable
-  private didOpenTextDocument: Disposable
-  constructor(context: ExtensionContext, metricsUtil: MetricsUtil) {
-    this.metricsUtil = metricsUtil
-    
-    this.onDidSaveTextDocument = workspace.onDidSaveTextDocument(e => {
-      this.update()
-    })
-    this.didOpenTextDocument = window.onDidChangeActiveTextEditor(e => {
-      this.disposeDecorators()
-      this.update()
-    })
-    this.update()
-  }
+    private metricsUtil: MetricsUtil;
+    private didChangeTextDocument: Disposable;
+    private didOpenTextDocument: Disposable;
+    constructor(context: ExtensionContext, metricsUtil: MetricsUtil) {
+        this.metricsUtil = metricsUtil;
 
-  private update() {
-    const editor = window.activeTextEditor
-
-    if (!editor || !editor.document) {
-      return
+        const debouncedUpdate = this.debounce(() => this.update(), 500);
+        this.didChangeTextDocument = workspace.onDidChangeTextDocument((e) => {
+            debouncedUpdate();
+        });
+        this.didOpenTextDocument = window.onDidChangeActiveTextEditor((e) => {
+            this.disposeDecorators();
+            this.update();
+        });
+        this.update();
     }
-    const document = editor.document
-    const settings = this.metricsUtil.appConfig.getCodeMetricsSettings(
-      document.uri
-    )
 
-    const languageDisabled =
-      this.metricsUtil.selector.filter(
-        s => s.language == document.languageId
-      ).length == 0
-    const decorationDisabled = !(
-      settings.DecorationModeEnabled || settings.OverviewRulerModeEnabled
-    )
-    if (decorationDisabled || languageDisabled) {
-      this.clearDecorators(editor)
-      return
+    private debounce(func: () => void, timeout): () => void {
+        let id;
+        return () => {
+            clearTimeout(id);
+            id = setTimeout(() => func(), timeout);
+        };
     }
-    // for some reason the context is lost
-    var thisContext = this
-    const size: number = workspace
-      .getConfiguration('editor', document.uri)
-      .get('fontSize')
-    this.metricsUtil.getMetrics(document).then(
-      metrics => {
-        if (
-          thisContext.settingsChanged(settings) ||
-          this.decoratorInstances.length === 0
-        ) {
-          thisContext.clearDecorators(editor)
+
+    private update() {
+        const editor = window.activeTextEditor;
+
+        if (!editor || !editor.document) {
+            return;
         }
-        const toDecoration = (model: IMetricsModel): DecorationOptions => {
-          return {
-            hoverMessage: model.toString(),
-            range: thisContext.metricsUtil.toDecorationRange(
-              model.start,
-              document
-            ),
-          }
+        const document = editor.document;
+        const settings = this.metricsUtil.appConfig.getCodeMetricsSettings(document.uri);
+
+        const languageDisabled = this.metricsUtil.selector.filter((s) => s.language == document.languageId).length == 0;
+        const decorationDisabled = !(settings.DecorationModeEnabled || settings.OverviewRulerModeEnabled);
+        if (decorationDisabled || languageDisabled) {
+            this.clearDecorators(editor);
+            return;
         }
-        const complexityAndModel: ComplexityToModel[] = metrics.map(p => {
-          return {complexity: p.getCollectedComplexity(), model: p}
-        })
+        // for some reason the context is lost
+        var thisContext = this;
+        this.metricsUtil.getMetrics(document).then(
+            (metrics) => {
+                if (thisContext.settingsChanged(settings) || this.low == null) {
+                    thisContext.clearDecorators(editor);
+                    thisContext.updateDecorators(settings, document.uri);
+                }
+                const toDecoration = (model: IMetricsModel): DecorationOptions => {
+                    return {
+                        hoverMessage: model.toString(settings),
+                        range: thisContext.metricsUtil.toDecorationRange(model.start, document),
+                    };
+                };
+                const complexityAndModel: ComplexityToModel[] = metrics.map((p) => {
+                    return { complexity: p.getCollectedComplexity(), model: p };
+                });
 
-        const decorations = complexityAndModel.map(p => ({
-          decorationStyle: toDecoration(p.model),
-          complexity: p.complexity,
-        }))
+                const lowLevelDecorations = complexityAndModel
+                    .filter((p) => p.complexity <= settings.ComplexityLevelNormal)
+                    .map((p) => toDecoration(p.model));
 
-        // need to reset all decorations before setting new ones
-        thisContext.decoratorInstances.forEach(decorator => {
-          editor.setDecorations(decorator, [])
-        })
+                const normalLevelDecorations = complexityAndModel
+                    .filter(
+                        (p) =>
+                            p.complexity > settings.ComplexityLevelNormal &&
+                            p.complexity <= settings.ComplexityLevelHigh
+                    )
+                    .map((p) => toDecoration(p.model));
 
-        const decoratorInstances = decorations.map(
-          ({decorationStyle, complexity}) => {
-            const decoration = this.createDecorationType(
-              settings.DecorationModeEnabled,
-              settings.OverviewRulerModeEnabled,
-              getColor(complexity),
-              size,
-              complexity
-            )
-            editor.setDecorations(decoration, [decorationStyle])
+                const highLevelDecorations = complexityAndModel
+                    .filter(
+                        (p) =>
+                            p.complexity > settings.ComplexityLevelHigh &&
+                            p.complexity <= settings.ComplexityLevelExtreme
+                    )
+                    .map((p) => toDecoration(p.model));
 
-            return decoration
-          }
-        )
-        thisContext.decoratorInstances = decoratorInstances
-      },
-      e => {
-        var exmsg = ''
-        if (e.message) {
-          exmsg += e.message
+                const extremeLevelDecorations = complexityAndModel
+                    .filter((p) => p.complexity > settings.ComplexityLevelExtreme)
+                    .map((p) => toDecoration(p.model));
+
+                editor.setDecorations(thisContext.low, lowLevelDecorations);
+                editor.setDecorations(thisContext.normal, normalLevelDecorations);
+                editor.setDecorations(thisContext.high, highLevelDecorations);
+                editor.setDecorations(thisContext.extreme, extremeLevelDecorations);
+            },
+            (e) => {
+                var exmsg = "";
+                if (e.message) {
+                    exmsg += e.message;
+                }
+                if (e.stack) {
+                    exmsg += " | stack: " + e.stack;
+                }
+                console.error(exmsg);
+            }
+        );
+    }
+    private settingsChanged(settings: IVSCodeMetricsConfiguration): boolean {
+        const changed =
+            settings.DecorationModeEnabled != this.decorationModeEnabled ||
+            settings.DecorationTemplate != this.decorationTemplate ||
+            settings.OverviewRulerModeEnabled != this.overviewRulerModeEnabled;
+        this.decorationModeEnabled = settings.DecorationModeEnabled;
+        this.decorationTemplate = settings.DecorationTemplate;
+        this.overviewRulerModeEnabled = settings.OverviewRulerModeEnabled;
+        return changed;
+    }
+    private clearDecorators(editor: TextEditor) {
+        this.low && editor.setDecorations(this.low, []);
+        this.normal && editor.setDecorations(this.normal, []);
+        this.high && editor.setDecorations(this.high, []);
+        this.extreme && editor.setDecorations(this.extreme, []);
+        this.disposeDecorators();
+    }
+
+    private updateDecorators(settings: IVSCodeMetricsConfiguration, resource: Uri) {
+        const size: number = workspace.getConfiguration("editor", resource).get("fontSize");
+
+        this.low = this.createDecorationType(
+            settings.DecorationModeEnabled,
+            settings.OverviewRulerModeEnabled,
+            settings.DecorationTemplate,
+            settings.ComplexityColorLow,
+            size
+        );
+        this.normal = this.createDecorationType(
+            settings.DecorationModeEnabled,
+            settings.OverviewRulerModeEnabled,
+            settings.DecorationTemplate,
+            settings.ComplexityColorNormal,
+            size
+        );
+        this.high = this.createDecorationType(
+            settings.DecorationModeEnabled,
+            settings.OverviewRulerModeEnabled,
+            settings.DecorationTemplate,
+            settings.ComplexityColorHigh,
+            size
+        );
+        this.extreme = this.createDecorationType(
+            settings.DecorationModeEnabled,
+            settings.OverviewRulerModeEnabled,
+            settings.DecorationTemplate,
+            settings.ComplexityColorExtreme,
+            size
+        );
+    }
+    createDecorationType(
+        decorationModeEnabled: boolean,
+        overviewRulerModeEnabled: boolean,
+        decorationTemplate: string,
+        color: string,
+        size: number
+    ) {
+        const options: DecorationRenderOptions = {
+            overviewRulerLane: OverviewRulerLane.Right,
+            overviewRulerColor: color,
+            before: {
+                contentIconPath: this.getContentIconPath(decorationTemplate, color, size),
+                margin: `${size / 2}px`,
+            },
+        };
+        if (!decorationModeEnabled) {
+            options.before = null;
         }
-        if (e.stack) {
-          exmsg += ' | stack: ' + e.stack
+        if (!overviewRulerModeEnabled) {
+            options.overviewRulerColor = null;
         }
-        console.error(exmsg)
-      }
-    )
-  }
-  private settingsChanged(settings: IVSCodeMetricsConfiguration): boolean {
-    const changed =
-      settings.DecorationModeEnabled != this.decorationModeEnabled ||
-      settings.OverviewRulerModeEnabled != this.overviewRulerModeEnabled
-    this.decorationModeEnabled = settings.DecorationModeEnabled
-    this.overviewRulerModeEnabled = settings.OverviewRulerModeEnabled
-    return changed
-  }
-  private clearDecorators(editor: TextEditor) {
-    if (this.decoratorInstances.length > 0) {
-      this.decoratorInstances.forEach(decorator => {
-        editor.setDecorations(decorator, [])
-      })
-      this.decoratorInstances = []
+        options.rangeBehavior = DecorationRangeBehavior.ClosedClosed;
+        return window.createTextEditorDecorationType(options);
     }
-    this.disposeDecorators()
-  }
+    getContentIconPath(decorationTemplate: string, color: string, size: number): Uri {
+        const templateVariables = { color, size };
+        const decoration = decorationTemplate.replace(/\{\{(.+?)\}\}/g, (match, varName) => templateVariables[varName]);
+        return Uri.parse(`data:image/svg+xml,` + encodeURIComponent(decoration));
+    }
+    disposeDecorators() {
+        this.low && this.low.dispose();
+        this.normal && this.normal.dispose();
+        this.high && this.high.dispose();
+        this.extreme && this.extreme.dispose();
+        this.low = null;
+        this.normal = null;
+        this.high = null;
+        this.extreme = null;
+    }
 
-  createDecorationType(
-    decorationModeEnabled: boolean,
-    overviewRulerModeEnabled: boolean,
-    color: string,
-    size: number,
-    complexity: number
-  ) {
-    const options: DecorationRenderOptions = {
-      overviewRulerLane: OverviewRulerLane.Right,
-      overviewRulerColor: color,
-      before: {
-        contentIconPath: this.getContentIconPath(
-          color,
-          size,
-          complexity
-        ),
-        margin: `${size / 2}px`,
-      },
+    public dispose(): void {
+        this.disposeDecorators();
+        this.didChangeTextDocument.dispose();
+        this.didOpenTextDocument.dispose();
     }
-    if (!decorationModeEnabled) {
-      options.before = null
-    }
-    if (!overviewRulerModeEnabled) {
-      options.overviewRulerColor = null
-    }
-    options.rangeBehavior = DecorationRangeBehavior.ClosedClosed
-    return window.createTextEditorDecorationType(options)
-  }
-  getContentIconPath(
-    color: string,
-    size: number,
-    complexity: number
-  ): Uri {
-    const template = complexity > 12 ? decorationTemplateComplex : decorationTemplateSimple
-    const textSize = toDecimal(size * 0.85)
-    const decoration = interpolate(template, {color, size, complexity, textSize})
-    
-    return Uri.parse(`data:image/svg+xml,` + encodeURIComponent(decoration))
-  }
-  disposeDecorators() {
-    if (this.decoratorInstances.length > 0) {
-      this.decoratorInstances.forEach(decorator => {
-        decorator.dispose()
-      })
-    }
-    this.decoratorInstances = []
-  }
-
-  public dispose(): void {
-    this.disposeDecorators()
-    this.onDidSaveTextDocument.dispose()
-    this.didOpenTextDocument.dispose()
-  }
 }
 
 interface ComplexityToModel {
-  complexity: number
-  model: IMetricsModel
+    complexity: number;
+    model: IMetricsModel;
 }

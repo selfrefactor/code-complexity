@@ -10,7 +10,6 @@ Differences:
 - using latest dependencies - main reason for the fork was to be able to update dependencies
 - show complexity number inside the decoration; no need to hover to see the number
 - different color sets depending if current theme is dark or light
-- instead of 4 levels of color decoration, there are around 25 levels.
 - no lua/vue/html support
 - no second decoration, `CodeLensEnabled` is not used
 

@@ -5,8 +5,9 @@ import { IVSCodeMetricsConfiguration } from "../common/VSCodeMetricsConfiguratio
 
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { IMetricsModel } from "../../tsmetrics-core/MetricsModel";
-import { MetricsParser } from "../../tsmetrics-core/MetricsParser";
+import { IMetricsParseResult, MetricsParser } from "../../tsmetrics-core/MetricsParser";
 import { MIN_COMPLEXITY } from "../../constants";
+
 
 export class MetricsParserUtil {
     constructor(private appConfig: IVSCodeMetricsConfiguration, private connection: Connection) {}
@@ -21,7 +22,20 @@ export class MetricsParserUtil {
             !this.isAboveFileSizeLimit(input) &&
             !this.isLanguageDisabled(document.languageId)
         ) {
-            let metrics = MetricsParser.getMetricsFromText(document.uri, input, this.appConfig, <any>target);
+            var metrics: IMetricsParseResult | undefined = undefined;
+            // todo remove isHTMLLike
+            if (this.isHTMLLike(document.languageId)) {
+                input = input.replace(/<script setup lang="(js|ts)">/gim, "<script --------------*/");
+                input = input.replace(/<script lang="(js|ts)" setup>/gim, "<script --------------*/");
+                input = input.replace(/<script lang="(js|ts)">/gim, "<script --------*/");
+                input = input.replace(/<script>/gim, "<scrip*/");
+                input = input.replace(/<\/script>/gim, "/*cript>");
+                input = "/*" + input.substring(2, input.length - 2) + "*/";
+
+                metrics = MetricsParser.getMetricsFromText(document.uri, input, this.appConfig, <any>target);
+            } else {
+                metrics = MetricsParser.getMetricsFromText(document.uri, input, this.appConfig, <any>target);
+            }
             var collect = (model: IMetricsModel) => {
                 if (model.visible && model.getCollectedComplexity() >= MIN_COMPLEXITY) {
                     result.push(model);
@@ -42,6 +56,7 @@ export class MetricsParserUtil {
         if (languageId == "typescriptreact" && !this.appConfig.EnabledForTSX) return true;
         if (languageId == "javascript" && !this.appConfig.EnabledForJS) return true;
         if (languageId == "javascriptreact" && !this.appConfig.EnabledForJSX) return true;
+        if (languageId == "html" && !this.appConfig.EnabledForHTML) return true;
         return false;
     }
 
@@ -63,5 +78,13 @@ export class MetricsParserUtil {
         return exclusionList.some((pattern) => {
             return new Minimatch(pattern).match(fileName);
         });
+    }
+
+    private isHTML(languageId: string) {
+        return languageId == "html";
+    }
+
+    private isHTMLLike(languageId: string) {
+        return this.isHTML(languageId);
     }
 }
