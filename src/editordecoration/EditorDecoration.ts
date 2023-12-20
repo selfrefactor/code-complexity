@@ -178,7 +178,7 @@ export class EditorDecoration implements Disposable {
     size: number,
     complexity: number
   ): Uri {
-    const template = complexity > 12 ? decorationTemplateComplex : decorationTemplateSimple
+    const template = complexity >= 12 ? decorationTemplateComplex : decorationTemplateSimple
     const textSize = toDecimal(size * 0.85)
     const decoration = interpolate(template, {color, size, complexity, textSize})
     
