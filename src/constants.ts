@@ -1,1 +1,1 @@
-export const MIN_COMPLEXITY = 5;
+export const MIN_COMPLEXITY = 0;
