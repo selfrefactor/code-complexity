@@ -161,7 +161,7 @@ export class EditorDecoration implements Disposable {
           size,
           complexity
         ),
-        margin: `${size / 2}px`,
+        margin: `${size}px`,
       },
     }
     if (!decorationModeEnabled) {
