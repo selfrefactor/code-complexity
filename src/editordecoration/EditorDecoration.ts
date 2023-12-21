@@ -48,10 +48,11 @@ export class EditorDecoration implements Disposable {
   }
 
   private resetDecorators() {
-    if (this.decoratorInstances.length == 0) return
+    var thisContext = this
+    if (thisContext.decoratorInstances.length == 0) return
     const editor = window.activeTextEditor
 
-    this.decoratorInstances.forEach(decorator => {
+    thisContext.decoratorInstances.forEach(decorator => {
       editor.setDecorations(decorator, [])
     })
   }
