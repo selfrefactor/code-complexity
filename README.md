@@ -7,6 +7,7 @@ Fork of https://github.com/kisstkondoros/codecomplexity
 Differences:
 
 - no change of decorations on unsaved changes; only on save event.
+- hide decorations when file is dirty, i.e. changed but not yet saved. This helps with hanging decorations(decorations on wrong lines), but also to optimize performance.
 - using latest dependencies - main reason for the fork was to be able to update dependencies
 - show complexity number inside the decoration; no need to hover to see the number
 - different color sets depending if current theme is dark or light
