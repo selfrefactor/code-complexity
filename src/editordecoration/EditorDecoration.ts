@@ -187,7 +187,7 @@ export class EditorDecoration implements Disposable {
   }
   getContentIconPath(color: string, size: number, complexity: number): Uri {
     const template =
-      complexity >= 12 ? decorationTemplateComplex : decorationTemplateSimple
+      complexity >= 6 ? decorationTemplateComplex : decorationTemplateSimple
     const textSize = toDecimal(size * 0.85)
     const decoration = interpolate(template, {
       color,
