@@ -7,9 +7,9 @@ function isDarkTheme() {
 }
 
 const LEVEL1 = [
-  "#00ff00",
-  "#00ff00",
-  "#00ff00",
+  "#83ee88",
+  "#83dd88",
+  "#83dd88",
   "#83c488",
   "#83c488",
   "#83c488",
