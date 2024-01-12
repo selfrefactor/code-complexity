@@ -14,13 +14,44 @@ import {
 import {MetricsUtil} from '../metrics/MetricsUtil'
 import {IVSCodeMetricsConfiguration} from '../metrics/common/VSCodeMetricsConfiguration'
 import {getColor} from './get-color'
-import {interpolate, toDecimal} from 'rambdax'
+import {interpolate, switcher, toDecimal} from 'rambdax'
 import {IMetricsModel} from '../tsmetrics-core/MetricsModel'
 
 let decorationTemplateSimple =
-  "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/></svg>"
+"<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/><rect x='{{innerX}}' y='{{innerY}}' width='{{innerSize}}px' height='{{innerSize}}px' style='fill:{{innerColor}};stroke-width:1px;stroke:{{innerColor}}'/></svg>"
+
 let decorationTemplateComplex =
   "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/><text dy='1px' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' style='fill:#fff;font-size:{{textSize}}px;'>{{complexity}}</text></svg>"
+
+let LIMIT_COMPLEXITY = 12
+
+    function calculateSize (complexity){
+      return switcher(complexity)
+        .is(1, 0)
+        .is(2, 0.1)
+        .is(3, 0.15)
+        .is(4, 0.25)
+        .is(5, 0.3)
+        .is(6, 0.35)
+        .is(7, 0.4)
+        .is(8, 0.45)
+        .is(9, 0.52)
+        .is(10, 0.55)
+        .default(0.6)
+  }
+
+  let innerSquareColor = '#5151ff'
+
+function getInterpolateInput(size, complexity){
+  let innerSquareSize = calculateSize(complexity) * size
+
+  return {
+    innerX: toDecimal((size - innerSquareSize)/2), 
+    innerY: toDecimal((size - innerSquareSize)/2), 
+       innerSize: innerSquareSize,
+       innerColor: innerSquareColor
+  }
+}
 
 export class EditorDecoration implements Disposable {
   private decoratorInstances: TextEditorDecorationType[] = []
@@ -186,16 +217,21 @@ export class EditorDecoration implements Disposable {
     return window.createTextEditorDecorationType(options)
   }
   getContentIconPath(color: string, size: number, complexity: number): Uri {
-    const template =
-      complexity >= 6 ? decorationTemplateComplex : decorationTemplateSimple
     const textSize = toDecimal(size * 0.85)
-    const decoration = interpolate(template, {
+    let isComplex = complexity >= LIMIT_COMPLEXITY
+    const template = isComplex ? decorationTemplateComplex : decorationTemplateSimple
+    let complexInput = {
       color,
       size,
       complexity,
       textSize,
-    })
-
+    }
+    
+    let interpolateInput = isComplex ? complexInput :   {
+      ...complexInput,
+      ...getInterpolateInput(size, complexity)
+    }
+    const decoration = interpolate(template, interpolateInput)
     return Uri.parse(`data:image/svg+xml,` + encodeURIComponent(decoration))
   }
   disposeDecorators() {
