@@ -26,7 +26,7 @@ let decorationTemplateComplex =
 let LIMIT_COMPLEXITY = 12
 
     function calculateSize (complexity){
-      return switcher(complexity)
+      return switcher<number>(complexity)
         .is(1, 0)
         .is(2, 0.1)
         .is(3, 0.15)
