@@ -134,7 +134,7 @@ export class EditorDecoration implements Disposable {
 				const decorations = complexityAndModel.map((p) => ({
 					decorationStyle: toDecoration(p.model),
 					complexity: p.complexity,
-				}));
+				})).slice(0, 50);
 
 				// need to reset all decorations before setting new ones
 				this.decoratorInstances.forEach((decorator) => {

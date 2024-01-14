@@ -10,7 +10,7 @@ Differences:
 - no change of decorations on unsaved changes; only on save event.
 - hide decorations when file is dirty, i.e. changed but not yet saved. This helps with hanging decorations(decorations on wrong lines), but also to optimize performance.
 - using latest dependencies - main reason for the fork was to be able to update dependencies
-- different color sets depending if current theme is dark or light
+- limit to 50 decorations per file due to performance reasons
 - no lua/vue/html support
 - no second decoration, `CodeLensEnabled` is not used
 
