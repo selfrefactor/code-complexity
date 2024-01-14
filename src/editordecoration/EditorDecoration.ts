@@ -13,7 +13,7 @@ import {
 } from 'vscode'
 import {MetricsUtil} from '../metrics/MetricsUtil'
 import {IVSCodeMetricsConfiguration} from '../metrics/common/VSCodeMetricsConfiguration'
-import {getColor} from './get-color'
+import {LIMIT_COMPLEXITY, getColor} from './get-color'
 import {interpolate, switcher, toDecimal} from 'rambdax'
 import {IMetricsModel} from '../tsmetrics-core/MetricsModel'
 
@@ -23,7 +23,6 @@ let decorationTemplateSimple =
 let decorationTemplateComplex =
   "<svg xmlns='http://www.w3.org/2000/svg' width='{{size}}px' height='{{size}}px' viewbox='0 0 {{size}} {{size}}'><rect width='{{size}}px' height='{{size}}px' style='fill:{{color}};stroke-width:1px;stroke:{{color}}'/><text dy='1px' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' style='fill:#fff;font-size:{{textSize}}px;'>{{complexity}}</text></svg>"
 
-let LIMIT_COMPLEXITY = 12
 
     function calculateSize (complexity){
       return switcher<number>(complexity)

@@ -1,60 +1,34 @@
-import {window, ColorThemeKind} from 'vscode'
-import { MIN_COMPLEXITY } from '../constants'
+// import {window, ColorThemeKind} from 'vscode'
+import { switcher } from 'rambdax'
 
-function isDarkTheme() {
-  const currentTheme = window.activeColorTheme.kind
-  return currentTheme === ColorThemeKind.Dark
+// function isDarkTheme() {
+//   const currentTheme = window.activeColorTheme.kind
+//   return currentTheme === ColorThemeKind.Dark
+// }
+
+export let LIMIT_COMPLEXITY = 12
+let STEP_COMPLEXITY = 12
+
+const LEVEL1 = {
+  level: LIMIT_COMPLEXITY,
+  color: "#83ee88"
+}
+const LEVEL2 ={
+  level: LIMIT_COMPLEXITY + STEP_COMPLEXITY,
+  color: "#3636ff"
 }
 
-const LEVEL1 = [
-  "#83ee88",
-  "#83dd88",
-  "#83dd88",
-  "#83ee88",
-  "#83dd88",
-  "#83dd88",
-  "#83c488",
-  "#83c488",
-  "#83c488",
-  "#83c488",
-  "#83c488",
-  "#83c488",
-  ]
+const LEVEL3 = {
+  level: LIMIT_COMPLEXITY + STEP_COMPLEXITY * 2,
+  color: "#ff3636"
+}
 
-const LEVEL2 = [
-  "#0000ff",
-  "#0d0dff",
-  "#1b1bff",
-  "#2828ff",
-  "#3636ff",
-  "#4444ff",
-  "#5151ff",
-  "#5f5fff",
-  "#6c6cff",
-  "#7a7aff",
-  "#8787ff"
-]
-
-const LEVEL3 =[
-  "#ff0000",
-  "#ff0d0d",
-  "#ff1b1b",
-  "#ff2828",
-  "#ff3636",
-  "#ff4444",
-  "#ff5151",
-  "#ff5f5f",
-  "#ff6c6c",
-  "#ff7a7a",
-  "#ff8787"
-]
-
-const colorsLight = [...LEVEL1, ...LEVEL2, ...LEVEL3]
-const colorsDark = [...LEVEL1.slice().reverse(), ...LEVEL2.slice().reverse(), ...LEVEL3.slice().reverse()]
-
-const colors = isDarkTheme() ? colorsDark : colorsLight
+// const colors = isDarkTheme() ? colorsDark : colorsLight
 
 export function getColor(complexity: number): string {
-  const actualIndex = complexity - MIN_COMPLEXITY
-  return colors[actualIndex] ?? '#f816f2'
+  return switcher<string>(complexity)
+    .is(x => x <= LEVEL1.level, LEVEL1.color)
+    .is(x => x <= LEVEL2.level, LEVEL2.color)
+    .is(x => x <= LEVEL3.level, LEVEL3.color)
+    .default('#f816f2')
 }
