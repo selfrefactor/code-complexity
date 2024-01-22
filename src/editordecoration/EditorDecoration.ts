@@ -35,7 +35,8 @@ function calculateSize(complexity) {
 		.is(8, 0.45)
 		.is(9, 0.52)
 		.is(10, 0.55)
-		.default(0.6);
+		.is(11, 0.58)
+		.default(0.61);
 }
 
 const innerSquareColor = '#5151ff';
@@ -213,7 +214,7 @@ export class EditorDecoration implements Disposable {
 	}
 	getContentIconPath(color: string, size: number, complexity: number): Uri {
 		const textSize = toDecimal(size * 0.85);
-		const isComplex = complexity >= LIMIT_COMPLEXITY;
+		const isComplex = complexity > LIMIT_COMPLEXITY;
 		const template = isComplex
 			? decorationTemplateComplex
 			: decorationTemplateSimple;
